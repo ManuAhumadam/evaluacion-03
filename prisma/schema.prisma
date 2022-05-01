@@ -1,0 +1,21 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
+}
+
+model Pet {
+  id     Int      @id @default(autoincrement())
+  name   String   @db.VarChar(50)
+  type   String   @db.VarChar(50)
+  birth  DateTime @db.Date()
+  photo  String?  @db.VarChar(255)
+  userId Int?
+
+  @@map("pets")
+}
