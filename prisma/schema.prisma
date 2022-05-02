@@ -17,5 +17,31 @@ model Pet {
   photo  String?  @db.VarChar(255)
   userId Int?
 
+
+
   @@map("pets")
+}
+
+model Task {
+  id      Int     @id @default(autoincrement())
+  title   String  @db.VarChar(50)
+  content String  @db.VarChar(50)
+  done    Boolean @db.TinyInt
+  userId  Int?
+  user    User?   @relation(fields: [userId], references: [id])
+
+
+  @@map("task")
+}
+
+model User {
+  id        Int    @id @default(autoincrement())
+  firstName String @db.VarChar(50)
+  lastName  String @db.VarChar(50)
+  email     String @unique @db.VarChar(80)
+  password  String @db.VarChar(60)
+  task      Task[]
+
+
+  @@map("users")
 }

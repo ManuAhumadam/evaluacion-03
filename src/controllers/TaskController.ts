@@ -1,0 +1,61 @@
+import { Request, Response } from "express"
+import { CreateTaskDTO, TaskDTO, UpdateTaskDTO } from "../models/dto/TaskDTO"
+import TaskRepository from "../models/repositories/TaskRepository"
+import { createTaskSchema, updateTaskSchema } from "../models/validators/TaskSchemas"
+
+export default class TaskController {
+    public readonly getAll = async (_req: Request, res: Response) => {
+        const repository = new TaskRepository(1)
+        const Task: TaskDTO[] = await repository.findAll()
+        res.json(Task)
+    }
+
+    public readonly getById = async (req: Request, res: Response) => {
+        const { id } = req.params
+        const repository = new TaskRepository(1)
+        const Task = await repository.findById(parseInt(id))
+        res.json(Task)
+    }
+
+    public readonly create = async (req: Request, res: Response) => {
+        const Task = req.body as CreateTaskDTO
+        
+        try{
+            await createTaskSchema.validateAsync(Task)
+        } catch (error) {
+            res.status(400).json({ massage: error.massage })
+            return
+        }
+        
+        const repository = new TaskRepository(1)
+
+        const newTask = await repository.create(Task)
+
+        res.json(newTask)
+    }
+    
+    public readonly update = async (req: Request, res: Response) => {
+        const { id } = req.params
+        const Task = req.body as UpdateTaskDTO
+
+        try{
+            await updateTaskSchema.validateAsync(Task)
+        } catch (error) {
+            res.status(400).json({ massage: error.massage })
+        }
+
+        const repository = new TaskRepository(1)
+        await repository.update(parseInt(id),Task)
+        
+        res.sendStatus(204)
+    }
+
+    public readonly delete = async (req: Request, res: Response) => {
+        const { id } = req.params
+
+        const repository = new TaskRepository(1)
+        await repository.delete(parseInt(id))
+
+        res.sendStatus(204)
+    }
+}

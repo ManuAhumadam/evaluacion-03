@@ -1,32 +1,19 @@
 import { Request, Response } from "express"
 import { CreatePetDTO, PetDTO, UpdatePetDTO } from "../models/dto/PetDTO"
-import { createPetSchema, updatePetSchema } from "../models/dto/petSchemas"
+import PetRepository from "../models/repositories/PetRepository"
+import { createPetSchema, updatePetSchema } from "../models/validators/petSchemas"
 
 export default class PetController {
     public readonly getAll = async (_req: Request, res: Response) => {
-        const pets: PetDTO[] = [
-            {
-                id:1,
-                name: 'Cheems',
-                type: 'Dog',
-                birth: new Date(),
-                photo: null,
-                userId: 1
-            }
-        ]
+        const repository = new PetRepository(1)
+        const pets: PetDTO[] = await repository.findAll()
         res.json(pets)
     }
 
     public readonly getById = async (req: Request, res: Response) => {
         const { id } = req.params
-        const pet: PetDTO = {
-                id: parseInt(id),
-                name: 'Cheems',
-                type: 'Dog',
-                birth: new Date(),
-                photo: null,
-                userId: 1
-            }
+        const repository = new PetRepository(1)
+        const pet = await repository.findById(parseInt(id))
         res.json(pet)
     }
 
@@ -37,12 +24,14 @@ export default class PetController {
             await createPetSchema.validateAsync(pet)
         } catch (error) {
             res.status(400).json({ massage: error.massage })
+            return
         }
-             
-        res.json({
-            id: 1,
-            ...pet
-        })
+        
+        const repository = new PetRepository(1)
+
+        const newPet = await repository.create(pet)
+
+        res.json(newPet)
     }
     
     public readonly update = async (req: Request, res: Response) => {
@@ -55,14 +44,18 @@ export default class PetController {
             res.status(400).json({ massage: error.massage })
         }
 
-        console.log('Esto debería Editar', id, pet)
-        res.sendStatus(204) // 
+        const repository = new PetRepository(1)
+        await repository.update(parseInt(id),pet)
+        
+        res.sendStatus(204)
     }
 
     public readonly delete = async (req: Request, res: Response) => {
         const { id } = req.params
 
-        console.log('Esto deberia Eliminar', id)
+        const repository = new PetRepository(1)
+        await repository.delete(parseInt(id))
+
         res.sendStatus(204)
     }
 }
