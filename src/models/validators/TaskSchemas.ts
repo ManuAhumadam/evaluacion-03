@@ -2,15 +2,15 @@ import Joi from 'joi'
 import { CreateTaskDTO, UpdateTaskDTO } from "../dto/TaskDTO"
 
 export const createTaskSchema: Joi.ObjectSchema<CreateTaskDTO> = Joi.object().keys({
-    name: Joi.string().required(),
-    type: Joi.string().required(),
-    birth: Joi.date().required(),
-    photo: Joi.string().uri()
+    title:   Joi.string().required(),
+    content: Joi.string().required(),
+    done:    Joi.boolean().required(),
+    userId:  Joi.number()
 })
 
 export const updateTaskSchema: Joi.ObjectSchema<UpdateTaskDTO> = Joi.object().keys({
-    name: Joi.string(),
-    type: Joi.string(),
-    birth: Joi.date(),
-    photo: Joi.string().uri()
+    title:   Joi.string(),
+    content: Joi.string(),
+    done:    Joi.boolean(),
+    userId:  Joi.number()
 })

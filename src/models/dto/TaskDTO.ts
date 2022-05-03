@@ -1,9 +1,10 @@
 export interface BaseTaskDTO {
-    in?: number
-    name: string
-    type: string
-    birth: Date
-    photo: string | null
+    id?:      number
+    title:    string
+    content:  string
+    done:     boolean
+    userId:   number | null
+
 }
 
 export interface TaskDTO extends BaseTaskDTO{

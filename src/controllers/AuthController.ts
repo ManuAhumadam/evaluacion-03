@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import bcrypt from 'bcryptjs'
-import { generateToken } from "../lib/jwt";
-import UserRepository from "../models/repositories/UserRepository";
+//import bcrypt from 'bcryptjs'
+//import { generateToken } from "../lib/jwt";
 import { CreateUserDTO } from "../models/dto/UserDTO";
+import UserRepository from "../models/repositories/UserRepository";
 import { loginSchema, registerSchema } from "../models/validators/userSchemas";
 
 export default class AuthController {
@@ -18,16 +18,19 @@ export default class AuthController {
 
     const repository = new UserRepository()
     try {
-      const user = await repository.findByEmail(credentials.email)
+      const userFromDb = await repository.findByEmail(credentials.email)
 
-      if (!user || !bcrypt.compareSync(credentials.password, user.password)) {
-        res.status(401).json({ error: 'Invalid credentials' })
-        return
-      }
-  
-      const token = generateToken(user)
-  
-      res.json({ token });
+//      if (!user || !bcrypt.compareSync(credentials.password, user.password)) {
+//      res.status(401).json({ error: 'Invalid credentials' })
+//      return
+//      }
+    if (!userFromDb || userFromDb.password !== credentials.password) {
+    res.status(401).json({ error: 'Invalid credentials' })
+    //return
+}  
+//      const token = generateToken(user)
+  res.sendStatus(200)
+//      res.json({ token });
     } catch (error) {
       console.log(error.message)
       res.status(500).json({ message: 'Something went wrong' })
@@ -46,10 +49,11 @@ export default class AuthController {
       return
     }
 
-    const hashedPassword = bcrypt.hashSync(user.password, 10)
+    //const hashedPassword = bcrypt.hashSync(user.password, 10)
 
     try {
-      const newUser = await repository.create({ ...user, password: hashedPassword })
+      //const newUser = await repository.create({ ...user, password: hashedPassword })
+      const newUser = await repository.create(user)
       res.status(201).json(newUser)
     } catch (error) {
       if (error.code = 'P2002') {
