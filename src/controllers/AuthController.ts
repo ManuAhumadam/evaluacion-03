@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-//import bcrypt from 'bcryptjs'
-//import { generateToken } from "../lib/jwt";
+import bcrypt from 'bcryptjs'
+import { generateToken } from "../lib/jwt";
 import { CreateUserDTO } from "../models/dto/UserDTO";
 import UserRepository from "../models/repositories/UserRepository";
 import { loginSchema, registerSchema } from "../models/validators/userSchemas";
@@ -20,17 +20,15 @@ export default class AuthController {
     try {
       const userFromDb = await repository.findByEmail(credentials.email)
 
-//      if (!user || !bcrypt.compareSync(credentials.password, user.password)) {
-//      res.status(401).json({ error: 'Invalid credentials' })
-//      return
-//      }
-    if (!userFromDb || userFromDb.password !== credentials.password) {
-    res.status(401).json({ error: 'Invalid credentials' })
-    //return
-}  
-//      const token = generateToken(user)
+      if (!userFromDb || !bcrypt.compareSync(credentials.password, userFromDb.password)) {
+      res.status(401).json({ error: 'Invalid credentials' })
+      return
+      }
+ 
+    const token = generateToken(userFromDb)
+
   res.sendStatus(200)
-//      res.json({ token });
+      res.json({ token });
     } catch (error) {
       console.log(error.message)
       res.status(500).json({ message: 'Something went wrong' })
@@ -39,8 +37,8 @@ export default class AuthController {
 
   public readonly register = async (req: Request, res: Response) => {
     const user = req.body as CreateUserDTO
-
     const repository = new UserRepository()
+   
 
     try {
       await registerSchema.validateAsync(user)
@@ -48,12 +46,11 @@ export default class AuthController {
       res.status(400).json({ error: error.message })
       return
     }
-
-    //const hashedPassword = bcrypt.hashSync(user.password, 10)
+    //Encriptador de contraseña
+    const hashedPassword = bcrypt.hashSync(user.password, 10)
 
     try {
-      //const newUser = await repository.create({ ...user, password: hashedPassword })
-      const newUser = await repository.create(user)
+      const newUser = await repository.create({ ...user, password: hashedPassword })
       res.status(201).json(newUser)
     } catch (error) {
       if (error.code = 'P2002') {

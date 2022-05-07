@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import tokenValidator from '../middlewares/tokenValidator'
 import authRoutes from './authRoutes'
 import healthRoutes from './healthRoutes'
 import petRoutes from './petRoutes'
@@ -13,6 +14,6 @@ apiRoutes.use('/pets', petRoutes)
 apiRoutes.use('/auth', authRoutes)
 
 //Tarea
-apiRoutes.use('/Task', TaskRoutes)
+apiRoutes.use('/Task', tokenValidator(), TaskRoutes)
 
 export default apiRoutes

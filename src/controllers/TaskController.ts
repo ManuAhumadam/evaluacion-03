@@ -1,18 +1,21 @@
 import { Request, Response } from "express"
 import { CreateTaskDTO, TaskDTO, UpdateTaskDTO } from "../models/dto/TaskDTO"
+import { UserTokenPayload } from '../models/dto/UserDTO'
 import TaskRepository from "../models/repositories/TaskRepository"
 import { createTaskSchema, updateTaskSchema } from "../models/validators/TaskSchemas"
 
 export default class TaskController {
-    public readonly getAll = async (_req: Request, res: Response) => {
-        const repository = new TaskRepository(1)
+    public readonly getAll = async (req: Request, res: Response) => {
+        const user = req.user as UserTokenPayload
+        const repository = new TaskRepository(user.sub)
         const Task: TaskDTO[] = await repository.findAll()
         res.json(Task)
     }
 
     public readonly getById = async (req: Request, res: Response) => {
+        const user = req.user as UserTokenPayload
         const { id } = req.params
-        const repository = new TaskRepository(1)
+        const repository = new TaskRepository(user.sub)
         const Task = await repository.findById(parseInt(id))
         res.json(Task)
     }
@@ -26,8 +29,9 @@ export default class TaskController {
             res.status(400).json({ massage: error.massage })
             return
         }
-        
-        const repository = new TaskRepository(1)
+      
+        const user = req.user as UserTokenPayload
+        const repository = new TaskRepository(user.sub)
 
         const newTask = await repository.create(Task)
 
@@ -43,8 +47,9 @@ export default class TaskController {
         } catch (error) {
             res.status(400).json({ massage: error.massage })
         }
-
-        const repository = new TaskRepository(1)
+        
+        const user = req.user as UserTokenPayload
+        const repository = new TaskRepository(user.sub)
         await repository.update(parseInt(id),Task)
         
         res.sendStatus(204)
@@ -53,7 +58,8 @@ export default class TaskController {
     public readonly delete = async (req: Request, res: Response) => {
         const { id } = req.params
 
-        const repository = new TaskRepository(1)
+        const user = req.user as UserTokenPayload
+        const repository = new TaskRepository(user.sub)
         await repository.delete(parseInt(id))
 
         res.sendStatus(204)

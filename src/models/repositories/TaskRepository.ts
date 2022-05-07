@@ -42,7 +42,7 @@ export default class TaskRepository {
   }
 
   public readonly update = async (id: number, Task: UpdateTaskDTO): Promise<void> => {
-    await prisma.task.update({
+    await prisma.task.updateMany({
       where: {
         id
       },
@@ -53,7 +53,7 @@ export default class TaskRepository {
   }
 
   public readonly delete = async (id: number): Promise<void> => {
-    await prisma.task.delete({
+    await prisma.task.deleteMany({
       where: {
         id
       }
